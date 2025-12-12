@@ -16,14 +16,4 @@ class TrackingSessionPolicy
     {
         return true;
     }
-
-    public function update(User $user, TrackingSession $session): bool
-    {
-        return $user->id === $session->user_id;
-    }
-
-    public function delete(User $user, TrackingSession $session): bool
-    {
-        return $user->id === $session->user_id;
-    }
 }

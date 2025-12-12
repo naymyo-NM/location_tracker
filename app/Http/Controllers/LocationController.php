@@ -10,43 +10,32 @@ use function Symfony\Component\Clock\now;
 
 class LocationController extends Controller
 {
-
-
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'device_id' => 'required|string',
             'session_id' => 'required|exists:tracking_sessions,id',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
-            'accuracy' => 'nullable|numeric',
+            'accuracy' => 'required|numeric',
+            'altitude' => 'nullable|numeric',
             'speed' => 'nullable|numeric',
+            'distance' => 'nullable|numeric',
             'timestamp' => 'nullable|date',
-
         ]);
 
+        $data['user_id'] = $request->user()->id;
+        $data['timestamp'] = $data['timestamp'] ?? now();
 
+        $location = Location::create($data);
 
-        $location = $request->user()->locations()->create([
-            'device_id' => $request->device_id,
-            'session_id' => $request->session_id,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
-            'accuracy' => $request->accuracy,
-            'speed' => $request->speed,
-            'timestamp' => $request->timestamp ?? now(),
-        ]);
-
-        return response()->json([
-            'message' => 'Location saved successfully',
-            'location' => $location,
-        ], 201);
+        return response()->json($location, 201);
     }
 
-    public function index(Request $request)
+    public function sessionLocations($sessionId)
     {
-        $locations = $request->user()->locations()->get();
-
-        return response()->json($locations);
+        return Location::where('session_id', $sessionId)
+            ->orderBy('timestamp')
+            ->get();
     }
 }

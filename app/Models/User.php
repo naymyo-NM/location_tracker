@@ -33,7 +33,7 @@ class User extends Authenticatable
         ];
     }
 
-    public function sessions()
+    public function trackingSessions()
     {
         return $this->hasMany(TrackingSession::class);
     }

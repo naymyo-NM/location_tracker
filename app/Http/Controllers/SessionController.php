@@ -8,66 +8,35 @@ use Illuminate\Http\Request;
 
 class SessionController extends Controller
 {
+
     public function index(Request $request)
     {
-        $sessions = $request->user()->sessions()->orderBy('started_at', 'desc')->get();
-
-        return response()->json($sessions);
+        return TrackingSession::where('user_id', $request->user()->id)
+            ->orderByDesc('started_at')
+            ->get();
     }
 
-    public function store(Request $request)
+    public function start(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:225',
+        $session = TrackingSession::create([
+            'user_id' => $request->user()->id,
+            'name'    => $request->name ?? 'New Session',
+            'started_at' => now(),
+            'is_active'  => true,
         ]);
 
-        $session = $request->user()->sessions()->create([
-            'name' => $request->name,
-            'is_active' => true,
-        ]);
-
-        return response()->json([
-            'message' => 'Session created successfully',
-            'session' => $session,
-        ], 201);
+        return response()->json($session, 201);
     }
 
-
-
-    public function update(Request $request, TrackingSession $session)
+    public function stop($id)
     {
-        if ($request->user()->id !== $session->user_id) {
-            abort(403, 'Unauthorized action.');
-        }
+        $session = TrackingSession::findOrFail($id);
 
-        $validated = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'ended_at' => 'sometimes|nullable|date',
-            'is_active' => 'sometimes|boolean',
+        $session->update([
+            'is_active' => false,
+            'ended_at' => now(),
         ]);
 
-        if ($request->has('ended_at') && $request->ended_at !== null) {
-            $validated['is_active'] = false;
-        }
-
-        if ($request->has('is_active') && $request->is_active === true) {
-            $validated['ended_at'] = null;
-        }
-
-        $session->update($validated);
-
-        return response()->json([
-            'message' => 'Session updated successfully',
-            'session' => $session,
-        ]);
-    }
-
-    public function destroy(TrackingSession $session)
-    {
-        $session->delete();
-
-        return response()->json([
-            'message' => 'Session deleted successfully'
-        ]);
+        return response()->json(['message' => 'Session stopped']);
     }
 }

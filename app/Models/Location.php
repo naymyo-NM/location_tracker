@@ -17,7 +17,7 @@ class Location extends Model
         'longitude',
         'accuracy',
         'speed',
-
+        'distance',
         'timestamp',
     ];
 
@@ -27,6 +27,7 @@ class Location extends Model
         'longitude' => 'float',
 
     ];
+
 
     public function user()
     {
