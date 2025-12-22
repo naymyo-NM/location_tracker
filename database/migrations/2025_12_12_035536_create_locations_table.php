@@ -16,12 +16,14 @@ return new class extends Migration
             $table->string('device_id')->index();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('session_id')->constrained('tracking_sessions')->onDelete('cascade');
-            $table->decimal('latitude', 10, 8);
-            $table->decimal('longitude', 11, 8);
+            $table->decimal('start_latitude', 10, 7);
+            $table->decimal('start_longitude', 10, 7);
+            $table->decimal('end_latitude', 10, 7);
+            $table->decimal('end_longitude', 10, 7);
             $table->double('accuracy');
-            $table->double('altitude')->nullable();
             $table->double('speed')->nullable();
             $table->double('distance')->nullable();
+            $table->integer('interval_seconds')->default(20);
             $table->timestamp('timestamp')->useCurrent();
             $table->timestamps();
 

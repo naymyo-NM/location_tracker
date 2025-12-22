@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Locations
     Route::post('locations', [LocationController::class, 'store']);
+    Route::get('locations', [LocationController::class, 'index']);
     Route::get('sessions/{id}/locations', [LocationController::class, 'sessionLocations']);
 });
 

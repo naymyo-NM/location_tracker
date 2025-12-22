@@ -13,18 +13,23 @@ class Location extends Model
         'device_id',
         'user_id',
         'session_id',
-        'latitude',
-        'longitude',
+        'start_latitude',
+        'start_longitude',
+        'end_latitude',
+        'end_longitude',
         'accuracy',
         'speed',
         'distance',
+        'interval_seconds',
         'timestamp',
     ];
 
     protected $casts = [
 
-        'latitude' => 'float',
-        'longitude' => 'float',
+        'start_latitude' => 'float',
+        'start_longitude' => 'float',
+        'end_latitude' => 'float',
+        'end_longitude' => 'float',
 
     ];
 
