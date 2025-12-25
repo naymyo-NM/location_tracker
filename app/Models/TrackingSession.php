@@ -37,4 +37,9 @@ class TrackingSession extends Model
     {
         return $this->hasMany(Location::class, 'session_id');
     }
+
+    public function trackings()
+    {
+        return $this->hasMany(Tracking::class, 'session_id');
+    }
 }

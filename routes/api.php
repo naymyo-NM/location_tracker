@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\TrackingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('locations', [LocationController::class, 'store']);
     Route::get('locations', [LocationController::class, 'index']);
     Route::get('sessions/{id}/locations', [LocationController::class, 'sessionLocations']);
+
+    //Tracking
+    Route::post('trackings', [TrackingController::class, 'storeTracking']);
 });
 
 

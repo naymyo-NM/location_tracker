@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tracking_sessions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->timestamp('started_at')->useCurrent();
             $table->timestamp('ended_at')->nullable();

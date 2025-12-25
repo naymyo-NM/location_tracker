@@ -9,38 +9,44 @@ class Location extends Model
 {
     use HasFactory;
 
+    // protected $table = 'locations';
+
     protected $fillable = [
         'device_id',
         'user_id',
         'session_id',
-        'start_latitude',
-        'start_longitude',
-        'end_latitude',
-        'end_longitude',
-        'accuracy',
+        'start_tracking_id',
+        'end_tracking_id',
         'speed',
         'distance',
-        'interval_seconds',
-        'timestamp',
+        'duration',
+
     ];
 
     protected $casts = [
 
-        'start_latitude' => 'float',
-        'start_longitude' => 'float',
-        'end_latitude' => 'float',
-        'end_longitude' => 'float',
+        'timestamp' => 'datetime',
+
 
     ];
 
 
     public function user()
     {
-        $this->belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function session()
     {
-        $this->belongsTo(TrackingSession::class, 'session_id');
+        return $this->belongsTo(TrackingSession::class, 'session_id');
+    }
+    public function startTracking()
+    {
+        return $this->belongsTo(Tracking::class, 'start_tracking_id');
+    }
+
+    public function endTracking()
+    {
+        return $this->belongsTo(Tracking::class, 'end_tracking_id');
     }
 }

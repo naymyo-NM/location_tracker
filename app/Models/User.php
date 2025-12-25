@@ -39,8 +39,13 @@ class User extends Authenticatable
     }
 
 
-    public function locations()
+    public function location()
     {
         return $this->hasMany(Location::class);
+    }
+
+    public function tracking()
+    {
+        return $this->hasMany(Tracking::class);
     }
 }
