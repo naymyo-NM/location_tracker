@@ -18,9 +18,9 @@ return new class extends Migration
             $table->foreignId('session_id')->constrained('tracking_sessions')->cascadeOnDelete();
             $table->foreignId('start_tracking_id')->constrained('trackings')->cascadeOnDelete();
             $table->foreignId('end_tracking_id')->nullable()->constrained('trackings')->nullOnDelete();
-            $table->double('speed')->nullable();
-            $table->double('distance')->nullable();
-            $table->integer('duration');
+            $table->decimal('speed', 10, 2)->nullable();
+            $table->decimal('distance', 10, 2)->nullable();
+            $table->decimal('duration', 8, 2)->nullable();
             $table->timestamp('timestamp')->useCurrent();
             $table->timestamps();
 

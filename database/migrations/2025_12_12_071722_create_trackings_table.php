@@ -18,7 +18,8 @@ return new class extends Migration
             $table->foreignId('session_id')->constrained('tracking_sessions')->cascadeOnDelete();
             $table->decimal('latitude', 10, 7);
             $table->decimal('longitude', 10, 7);
-            $table->double('accuracy');
+            $table->decimal('accuracy', 10, 2);
+            $table->decimal('duration', 8, 2)->nullable();
             $table->timestamp('tracking_time')->useCurrent();
             $table->timestamps();
         });

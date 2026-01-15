@@ -42,6 +42,7 @@ class TrackingController extends Controller
             'latitude'   => 'required|numeric|between:-90,90',
             'longitude'  => 'required|numeric|between:-180,180',
             'accuracy'   => 'required|numeric|min:0',
+            'duration'   => 'required|numeric|min:0',
             'tracking_time' => 'nullable|date',
         ]);
 
@@ -58,6 +59,7 @@ class TrackingController extends Controller
                 'latitude' => $request->latitude,
                 'longitude' => $request->longitude,
                 'accuracy' => $request->accuracy,
+                'duration' => $request->duration,
                 'tracking_time' => now(),
             ]);
 
@@ -87,23 +89,31 @@ class TrackingController extends Controller
                     $endTracking->longitude
                 );
 
+                $durationSeconds = $startTracking->created_at->diffInSeconds($endTracking->created_at);
 
-                $durationSeconds = $openLocation->created_at->diffInSeconds(now());
-                $durationMinutes = round($durationSeconds / 60, 2);
 
                 /** Speed in km/h */
-                $speed = $durationMinutes > 0
-                    ? ($distance / 1000) / ($durationMinutes / 60)
+                $speed = $durationSeconds > 0
+                    ? ($distance / 1000) / ($durationSeconds / 3600)
                     : 0;
 
-
-
-
+                /** 1️⃣ Close previous location */
                 $openLocation->update([
                     'end_tracking_id' => $tracking->id,
                     'distance'        => round($distance, 2),
-                    'duration'        => $durationMinutes,
+                    'duration'        => $durationSeconds,
                     'speed'           => round($speed, 2),
+                ]);
+
+                Location::create([
+                    'device_id' => $tracking->device_id,
+                    'user_id' => Auth::user()->id,
+                    'session_id' => $tracking->session_id,
+                    'start_tracking_id' => $tracking->id,
+                    'speed' => 0,
+                    'distance' => 0,
+                    'duration' => 0,
+                    'timestamp' => now()
                 ]);
             }
             DB::commit();

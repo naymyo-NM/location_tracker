@@ -20,6 +20,7 @@ class Tracking extends Model
         'latitude',
         'longitude',
         'accuracy',
+        'duration',
 
     ];
 

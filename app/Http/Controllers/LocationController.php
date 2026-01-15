@@ -27,4 +27,11 @@ class LocationController extends Controller
             ->orderBy('timestamp')
             ->get();
     }
+
+    public function userLocationsHistory($userId)
+    {
+        return Location::where('user_id', $userId)
+            ->orderBy('timestamp', 'desc')
+            ->get();
+    }
 }
