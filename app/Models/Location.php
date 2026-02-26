@@ -20,7 +20,7 @@ class Location extends Model
         'speed',
         'distance',
         'duration',
-
+        'timestamp',
     ];
 
     protected $casts = [

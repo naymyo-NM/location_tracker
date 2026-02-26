@@ -21,7 +21,7 @@ class Tracking extends Model
         'longitude',
         'accuracy',
         'duration',
-
+        'tracking_time',
     ];
 
     protected $casts = [
