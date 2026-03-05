@@ -426,4 +426,30 @@ class TrackingController extends Controller
             'failed' => $failed,
         ], 201);
     }
+
+    /**
+     * Return raw tracking points for a session ordered by tracking_time.
+     * Useful for analytics and drawing precise polylines on clients.
+     */
+    public function sessionPoints(Request $request, int $sessionId)
+    {
+        $session = TrackingSession::findOrFail($sessionId);
+        if ($session->user_id !== $request->user()->id) {
+            abort(403, 'Unauthorized');
+        }
+
+        $points = Tracking::where('session_id', $sessionId)
+            ->orderBy('tracking_time')
+            ->get([
+                'id',
+                'session_id',
+                'latitude',
+                'longitude',
+                'accuracy',
+                'duration',
+                'tracking_time',
+            ]);
+
+        return response()->json($points);
+    }
 }

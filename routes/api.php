@@ -19,13 +19,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('sessions/start', [SessionController::class, 'start']);
     Route::post('sessions/{id}/stop', [SessionController::class, 'stop']);
 
-    Route::post('locations', [LocationController::class, 'store']);
-    Route::get('locations', [LocationController::class, 'index']);
     Route::get('sessions/{id}/locations', [LocationController::class, 'sessionLocations']);
-    Route::get('user/{id}/locations', [LocationController::class, 'userLocationsHistory']);
-    Route::get('sessions/{id}/live', [LocationController::class, 'sessionLive']);
-    Route::get('user/{id}/live', [LocationController::class, 'userLive']);
 
     Route::post('trackings', [TrackingController::class, 'storeTracking']);
     Route::post('trackings/batch', [TrackingController::class, 'storeBatch']);
+    Route::get('sessions/{id}/points', [TrackingController::class, 'sessionPoints']);
 });
