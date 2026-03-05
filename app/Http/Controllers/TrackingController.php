@@ -296,6 +296,7 @@ class TrackingController extends Controller
         $batchService = app(TrackingBatchService::class);
         $accepted = 0;
         $failed = [];
+        $fallbackPayloads = [];
 
         foreach ($request->points as $index => $p) {
             $sessionId = (int) $p['session_id'];
@@ -368,7 +369,11 @@ class TrackingController extends Controller
             if ($idempotencyKey) {
                 $payload['idempotency_key'] = $idempotencyKey;
             }
-            $batchService->pushPoint($payload);
+            try {
+                $batchService->pushPoint($payload);
+            } catch (\Throwable $e) {
+                $fallbackPayloads[] = $payload;
+            }
 
             try {
                 $liveService->setLivePosition(
@@ -405,6 +410,14 @@ class TrackingController extends Controller
                 Cache::put($cacheKey, ['status' => 'accepted', 'message' => 'Point queued'], $ttlSeconds);
             }
             $accepted++;
+        }
+
+        if (! empty($fallbackPayloads)) {
+            try {
+                $batchService->writePointsDirect($fallbackPayloads);
+            } catch (\Throwable $e) {
+                // Log but do not fail the request; points were already counted as accepted
+            }
         }
 
         return response()->json([

@@ -15,6 +15,31 @@ class TrackingBatchService
         Redis::connection()->rpush($key, json_encode($payload));
     }
 
+    /**
+     * Write points directly to the database (e.g. when Redis is unavailable).
+     * Payloads must include user_id, device_id, session_id, latitude, longitude, accuracy, duration, tracking_time.
+     */
+    public function writePointsDirect(array $payloads): void
+    {
+        if (empty($payloads)) {
+            return;
+        }
+        $bySession = [];
+        foreach ($payloads as $p) {
+            if (empty($p['session_id']) || empty($p['user_id'])) {
+                continue;
+            }
+            $sid = (int) $p['session_id'];
+            if (! isset($bySession[$sid])) {
+                $bySession[$sid] = [];
+            }
+            $bySession[$sid][] = $p;
+        }
+        foreach ($bySession as $sessionId => $points) {
+            $this->processSessionBatch($sessionId, $points);
+        }
+    }
+
     public function processBatch(): int
     {
         $key = config('tracking.batch_redis_list_key', 'tracking:batch:pending');
