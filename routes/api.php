@@ -21,7 +21,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('sessions/{id}/locations', [LocationController::class, 'sessionLocations']);
 
-    Route::post('trackings', [TrackingController::class, 'storeTracking']);
     Route::post('trackings/batch', [TrackingController::class, 'storeBatch']);
-    Route::get('sessions/{id}/points', [TrackingController::class, 'sessionPoints']);
 });

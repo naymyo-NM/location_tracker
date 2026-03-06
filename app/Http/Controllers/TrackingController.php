@@ -36,6 +36,10 @@ class TrackingController extends Controller
         return $angle * $earthRadius; // meters
     }
 
+    // NOT USED — single-point endpoint removed from routes.
+    // Route was: POST /api/trackings
+    // Kept for reference only.
+    /*
     public function storeTracking(Request $request)
     {
         $request->validate([
@@ -272,6 +276,7 @@ class TrackingController extends Controller
             ], 500);
         }
     }
+    */ // end storeTracking
 
     public function storeBatch(Request $request)
     {
@@ -427,10 +432,10 @@ class TrackingController extends Controller
         ], 201);
     }
 
-    /**
-     * Return raw tracking points for a session ordered by tracking_time.
-     * Useful for analytics and drawing precise polylines on clients.
-     */
+    // NOT USED — raw points endpoint removed from routes.
+    // Route was: GET /api/sessions/{id}/points
+    // Kept for reference only.
+    /*
     public function sessionPoints(Request $request, int $sessionId)
     {
         $session = TrackingSession::findOrFail($sessionId);
@@ -452,4 +457,5 @@ class TrackingController extends Controller
 
         return response()->json($points);
     }
+    */ // end sessionPoints
 }
