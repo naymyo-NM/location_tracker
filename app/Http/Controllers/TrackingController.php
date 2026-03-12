@@ -371,6 +371,9 @@ class TrackingController extends Controller
                 'duration' => $p['duration'],
                 'tracking_time' => is_string($trackingTime) ? $trackingTime : \Carbon\Carbon::parse($trackingTime)->toIso8601String(),
             ];
+            if (isset($p['speed'])) {
+                $payload['speed'] = (float) $p['speed'];
+            }
             if ($idempotencyKey) {
                 $payload['idempotency_key'] = $idempotencyKey;
             }
