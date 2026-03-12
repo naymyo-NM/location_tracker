@@ -118,6 +118,9 @@ class TrackingBatchService
                 if (! $tracking) {
                     continue;
                 }
+                $pointSpeed = isset($points[$i]['speed']) ? (float) $points[$i]['speed'] : null;
+                $pointDuration = isset($points[$i]['duration']) ? (float) $points[$i]['duration'] : null;
+
                 if ($openLocation) {
                     $startT = Tracking::find($openLocation->start_tracking_id);
                     $distance = $startT ? $this->calculateDistance(
@@ -127,11 +130,13 @@ class TrackingBatchService
                         $tracking->longitude
                     ) : 0;
                     $durationSeconds = $startT ? $startT->created_at->diffInSeconds($tracking->created_at) : 0;
-                    $speed = $durationSeconds > 0 ? ($distance / 1000) / ($durationSeconds / 3600) : 0;
+                    $computedSpeed = $durationSeconds > 0 ? ($distance / 1000) / ($durationSeconds / 3600) : 0;
+                    $speed = $pointSpeed !== null ? $pointSpeed : $computedSpeed;
+                    $duration = $pointDuration !== null ? $pointDuration : $durationSeconds;
                     $openLocation->update([
                         'end_tracking_id' => $trackingId,
                         'distance' => round($distance, 2),
-                        'duration' => $durationSeconds,
+                        'duration' => $duration,
                         'speed' => round($speed, 2),
                     ]);
                     $openLocation = null;
@@ -142,7 +147,7 @@ class TrackingBatchService
                     'session_id' => $sessionId,
                     'start_tracking_id' => $trackingId,
                     'end_tracking_id' => null,
-                    'speed' => 0,
+                    'speed' => $pointSpeed !== null ? round($pointSpeed, 2) : 0,
                     'distance' => 0,
                     'duration' => 0,
                     'timestamp' => $tracking->tracking_time ?? now(),
