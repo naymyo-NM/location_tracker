@@ -13,6 +13,7 @@ class ProcessTrackingBatchJob implements ShouldQueue
 
     public $tries = 3;
 
+
     public function handle(TrackingBatchService $batchService): void
     {
         if (! config('tracking.use_batch_write', true)) {

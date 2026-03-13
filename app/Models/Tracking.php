@@ -47,4 +47,9 @@ class Tracking extends Model
     {
         return $this->hasMany(Location::class, 'end_tracking_id');
     }
+
+    public function snappedPoints()
+    {
+        return $this->hasOne(TrackingSnappedPoints::class, 'tracking_id');
+    }
 }

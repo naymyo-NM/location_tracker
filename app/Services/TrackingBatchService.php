@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Models\Location;
 use App\Models\Tracking;
+use App\Models\TrackingSnappedPoints;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 
 class TrackingBatchService
@@ -95,6 +97,7 @@ class TrackingBatchService
         DB::beginTransaction();
         try {
             $trackingIds = [];
+            $mapPoints = [];
             foreach ($points as $p) {
                 $tracking = Tracking::create([
                     'user_id' => (int) $p['user_id'],
@@ -107,8 +110,18 @@ class TrackingBatchService
                     'tracking_time' => isset($p['tracking_time']) ? $p['tracking_time'] : now(),
                 ]);
                 $trackingIds[] = $tracking->id;
-            }
 
+                   
+
+                $mapPoints[] = [
+                    'lat' => $p['latitude'],
+                    'lon' => $p['longitude']
+                ];
+            
+
+               
+            }
+            
             $openLocation = Location::where('session_id', $sessionId)->whereNull('end_tracking_id')->latest('id')->first();
             $deviceId = $points[0]['device_id'] ?? '';
             $userId = (int) $points[0]['user_id'];
@@ -150,9 +163,29 @@ class TrackingBatchService
                 $openLocation = Location::where('session_id', $sessionId)->whereNull('end_tracking_id')->latest('id')->first();
             }
 
+            $mapService = app(MapMatchingService::class);
+            $result = $mapService->snapPoints($mapPoints);
+
+            foreach ($result['results'] as $index => $snap) {
+                if (!isset($trackingIds[$index])) continue;
+
+                TrackingSnappedPoints::create([
+                    'tracking_id' => $trackingIds[$index],
+                    'road_id' => $snap['road_id'] ?? null,
+                    'road_type' => $snap['road_type'] ?? null,
+                    'snapped_lat' => $snap['snapped_lat'] ?? null,
+                    'snapped_lon' => $snap['snapped_lon'] ?? null,
+                ]);
+            }
             DB::commit();
         } catch (\Throwable $e) {
             DB::rollBack();
+            Log::error('processSessionBatch failed', [
+                'session_id' => $sessionId,
+                'points_count' => count($points),
+                'error' => $e->getMessage(),
+                'stack' => $e->getTraceAsString()
+            ]);
             throw $e;
         }
     }

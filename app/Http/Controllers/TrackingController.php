@@ -15,26 +15,26 @@ use Illuminate\Support\Facades\DB;
 
 class TrackingController extends Controller
 {
-    private function calculateDistance($lat1, $lon1, $lat2, $lon2)
-    {
-        $earthRadius = 6371000; // meters
+    // private function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    // {
+    //     $earthRadius = 6371000; // meters
 
-        $latFrom = deg2rad($lat1);
-        $lonFrom = deg2rad($lon1);
-        $latTo   = deg2rad($lat2);
-        $lonTo   = deg2rad($lon2);
+    //     $latFrom = deg2rad($lat1);
+    //     $lonFrom = deg2rad($lon1);
+    //     $latTo   = deg2rad($lat2);
+    //     $lonTo   = deg2rad($lon2);
 
-        $latDelta = $latTo - $latFrom;
-        $lonDelta = $lonTo - $lonFrom;
+    //     $latDelta = $latTo - $latFrom;
+    //     $lonDelta = $lonTo - $lonFrom;
 
-        $angle = 2 * asin(sqrt(
-            pow(sin($latDelta / 2), 2) +
-                cos($latFrom) * cos($latTo) *
-                pow(sin($lonDelta / 2), 2)
-        ));
+    //     $angle = 2 * asin(sqrt(
+    //         pow(sin($latDelta / 2), 2) +
+    //             cos($latFrom) * cos($latTo) *
+    //             pow(sin($lonDelta / 2), 2)
+    //     ));
 
-        return $angle * $earthRadius; // meters
-    }
+    //     return $angle * $earthRadius; // meters
+    // }
 
     // NOT USED — single-point endpoint removed from routes.
     // Route was: POST /api/trackings
@@ -376,6 +376,7 @@ class TrackingController extends Controller
             }
             try {
                 $batchService->pushPoint($payload);
+                
             } catch (\Throwable $e) {
                 $fallbackPayloads[] = $payload;
             }
@@ -392,7 +393,7 @@ class TrackingController extends Controller
                     isset($p['speed']) ? (float) $p['speed'] : null
                 );
             } catch (\Throwable $e) {
-                // Non-fatal
+                
             }
             try {
                 event(new TrackingPositionReceived(
@@ -425,12 +426,16 @@ class TrackingController extends Controller
             }
         }
 
+      
+
         return response()->json([
             'status' => 'success',
             'accepted' => $accepted,
             'failed' => $failed,
         ], 201);
     }
+
+
 
     // NOT USED — raw points endpoint removed from routes.
     // Route was: GET /api/sessions/{id}/points
