@@ -40,6 +40,8 @@ class Location extends Model
     {
         return $this->belongsTo(TrackingSession::class, 'session_id');
     }
+
+
     public function startTracking()
     {
         return $this->belongsTo(Tracking::class, 'start_tracking_id');
